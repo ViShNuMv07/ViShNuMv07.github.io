@@ -777,11 +777,53 @@
     }, { passive: true });
 
     // ── FORM
-    function handleSend(e) {
-        e.preventDefault(); const b = e.target;
-        b.textContent = 'Message Sent ✓'; b.style.background = 'rgba(16,240,138,0.9)'; b.style.color = '#050f14';
-        setTimeout(() => { b.textContent = 'Send Message ➤'; b.style.background = ''; b.style.color = ''; }, 3000);
+    function handleSend(e){
+  e.preventDefault();
+  const btn = e.target;
+  const name = document.querySelector('.cform input[type="text"]').value;
+  const email = document.querySelector('.cform input[type="email"]').value;
+  const message = document.querySelector('.cform textarea').value;
+
+  if(!name || !email || !message){
+    btn.textContent = 'Fill all fields!';
+    btn.style.background = 'rgba(255,80,80,0.9)';
+    btn.style.color = '#fff';
+    setTimeout(()=>{btn.textContent='Send Message ➤';btn.style.background='';btn.style.color='';},2000);
+    return;
+  }
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  fetch('https://formspree.io/f/xkoqzpvz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, message })
+  })
+  .then(res => {
+    if(res.ok){
+      btn.textContent = 'Message Sent ✓';
+      btn.style.background = 'rgba(16,240,138,0.9)';
+      btn.style.color = '#050f14';
+      document.querySelector('.cform input[type="text"]').value = '';
+      document.querySelector('.cform input[type="email"]').value = '';
+      document.querySelector('.cform textarea').value = '';
+    } else {
+      btn.textContent = 'Failed. Try again!';
+      btn.style.background = 'rgba(255,80,80,0.9)';
+      btn.style.color = '#fff';
     }
+    btn.disabled = false;
+    setTimeout(()=>{btn.textContent='Send Message ➤';btn.style.background='';btn.style.color='';},3000);
+  })
+  .catch(()=>{
+    btn.textContent = 'Network Error!';
+    btn.style.background = 'rgba(255,80,80,0.9)';
+    btn.style.color = '#fff';
+    btn.disabled = false;
+    setTimeout(()=>{btn.textContent='Send Message ➤';btn.style.background='';},3000);
+  });
+}
 </script>
 </body>
 </html>
